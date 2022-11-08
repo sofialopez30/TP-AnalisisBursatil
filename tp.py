@@ -111,3 +111,7 @@ def monthly_average(variable, diccionario):
 diccionario = read_file("/Users/sofialopezmoreno/Library/Mobile Documents/com~apple~CloudDocs/ipc/TP-AnalisisBursatil/bolsa.csv")
 
 fechas, promedio_mes = monthly_average("SATL", diccionario)
+with open("monthly_average_SATL.csv", "a") as archivo: 
+    fechas, promedio_mes = monthly_average("SATL", diccionario)
+    for x in zip(fechas,promedio_mes):
+        archivo.write(str(x) + "\n")
