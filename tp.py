@@ -145,10 +145,36 @@ def report_max_gains(diccionario, fecha_venta):
         if ganancia<0: 
             escribir = escribir + f'La acción {accion} solo genera perdidas'
         archivo.write(escribir)
+
+def plot_price(accion, diccionario):
+    '''
+    Esta función tiene como objetivo obetener un gráfico de lineas acerca el precio de las acciones, fecha por fecha de dicha accion
+    con el nombre price_MELI.png. 
+    ENTRADA: una de las acciones, el diccionario obtenido a partir de la función read_file(), y una acción.
+    SALIDA: un gráfico de lineas  acerca el precio de las acciones, fecha por fecha de dicha accion
+    con el nombre price_MELI.png. 
+    '''
+    fecha = []
+    valores = []
+    diccioconfechas = {}
+    for fechas in diccionario.get("Date"):
+        fecha.append(fechas)
+    for valores_accion in diccionario.get(accion):
+        valores.append(float(valores_accion))
+    for dates, values in zip(fecha, valores):
+        if dates not in diccioconfechas.keys():
+            diccioconfechas[dates] = values
+    xpoint= list(diccioconfechas.keys())
+    ypoints= list(diccioconfechas.values())
+    plt.plot(xpoint, ypoints)
+    plt.show()
     
+
+
+
 """ >>>> ESCRIBAN SU CÓDIGO A PARTIR DE AQUÍ >>>> """
 
-diccionario = read_file("/Users/chiarafacal/OneDrive/PENSAMIENTO COMPUTACIONAL/bolsa.csv")
+diccionario = read_file("/Users/sofialopezmoreno/Library/Mobile Documents/com~apple~CloudDocs/ipc/TP-AnalisisBursatil/bolsa.csv")
 
 fechas, promedios_mes = monthly_average("SATL", diccionario)
 
@@ -162,3 +188,13 @@ accion = "RTX"
 fecha_compra, ganancia = max_gain("RTX", diccionario, fecha_venta)
 
 report_max_gains(diccionario,fecha_venta)
+
+plot_price("MELI", diccionario)
+
+
+
+
+    
+
+    
+
