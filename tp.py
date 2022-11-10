@@ -106,12 +106,59 @@ def monthly_average(variable, diccionario):
         listapromedio.append(calculo)
     return listafechas, listapromedio
 
+def max_gain(accion,diccionario, fecha_venta):
+    """
+    Esta función encuentra el precio de la acción fue el menor (teniendo en cuanta la fecha de venta de la acción) y cual fue la ganancia entre el precio de venta y el precio de compra. 
+    ENTRADAS: una de las acciones, el diccionario obtenido a partir de la función read_file(), y una fecha de venta para la acción. 
+    SALIDAS: la fecha donde la acción tuvo el menor precio (teniendo en cuenta que tiene que ser antes de la fecha de venta de la acción), es decir la mejor fecha para comprar la acción, y la ganancia entre el precio de compra y el precio de venta.
+    """
+    fecha = []
+    valores = []
+    diccioconfechas = {}
+    diccioconvalores = {}
+    for fechas in diccionario.get("Date"):
+        fecha.append(fechas)
+    for valores_accion in diccionario.get(accion):
+        valores.append(float(valores_accion))
+    for dates, values in zip(fecha, valores):
+        if dates not in diccioconfechas.keys():
+            diccioconfechas[dates] = values
+        if values not in diccioconvalores.keys():
+            diccioconvalores[values] = dates
+    valor_de_venta = diccioconfechas.get(fecha_venta)
+    posicion_de_fecha = valores.index(valor_de_venta)
+    valoresantesdelafecha = valores[0:posicion_de_fecha]
+    mejor_valor_de_compra = min(valoresantesdelafecha)
+    fecha_compra = diccioconvalores.get(mejor_valor_de_compra)
+    ganancia = ((valor_de_venta-mejor_valor_de_compra)/mejor_valor_de_compra)
+    return fecha_compra, ganancia
+
+def report_max_gains(diccionario, fecha_venta):
+    """
+    Esta función escribe en un archivo de texto el resumen del rendimiento de la acción, a partir de la compra en una determinada fecha. 
+    ENTRADA: el diccionario obtenido a partir de la función read_file() y una fecha de venta.
+    SALIDA: esta función no retorna nada en sí, sino que escribe en un archivo de texto el resumen del rendimiento de la acción. En caso de que la acción tenga una ganancia negativa, informa tambien esto.
+    """
+    with open("resumen_mejor_compra.txt", "a", encoding="utf-8") as archivo: 
+        fecha_compra, ganancia = max_gain(accion, diccionario,fecha_venta)
+        escribir = f'{accion} genera una ganancia de {ganancia*100} % habiendo comprado en {fecha_compra} y vendiéndose en {fecha_venta}'
+        if ganancia<0: 
+            escribir = escribir + f'La acción {accion} solo genera perdidas'
+        archivo.write(escribir)
+    
 """ >>>> ESCRIBAN SU CÓDIGO A PARTIR DE AQUÍ >>>> """
 
-diccionario = read_file("/Users/sofialopezmoreno/Library/Mobile Documents/com~apple~CloudDocs/ipc/TP-AnalisisBursatil/bolsa.csv")
+diccionario = read_file("/Users/chiarafacal/OneDrive/PENSAMIENTO COMPUTACIONAL/bolsa.csv")
 
-fechas, promedio_mes = monthly_average("SATL", diccionario)
+fechas, promedios_mes = monthly_average("SATL", diccionario)
+
 with open("monthly_average_SATL.csv", "a") as archivo: 
     fechas, promedio_mes = monthly_average("SATL", diccionario)
     for x in zip(fechas,promedio_mes):
         archivo.write(str(x) + "\n")
+
+fecha_venta = "2022-06-06"
+accion = "RTX"
+fecha_compra, ganancia = max_gain("RTX", diccionario, fecha_venta)
+
+report_max_gains(diccionario,fecha_venta)
