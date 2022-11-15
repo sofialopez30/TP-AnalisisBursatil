@@ -50,7 +50,7 @@ def datetime2str(date, fmt="%Y-%m-%d"):
             output.append(d.strftime(fmt))
         if isinstance(date, np.ndarray):
             output = np.array(output)
-        return output
+    return output
 
 
 """ >>>> DEFINAN SUS FUNCIONES A PARTIR DE AQUÍ >>>> """
@@ -166,15 +166,44 @@ def plot_price(accion, diccionario):
             diccioconfechas[dates] = values
     xpoint= list(diccioconfechas.keys())
     ypoints= list(diccioconfechas.values())
+    plt.title = f"Precio de la acción {accion}"
     plt.plot(xpoint, ypoints)
     plt.show()
+
+def monthly_average_bar_plot(acción, diccionario):
+    """
+    Esta función devuelve un gráfico de barras donde se muestra el promedio de la acción mes a mes. 
+    ENTRADA: el nombre de una acción y el diccionario surgido a partir de read_file().
+    SALIDA: un gráfico de barras con lo mencionado anteriormente. 
+    """
+    listademeses = []
+    fechas, promedios = (monthly_average(accion, diccionario))
+    for x in fechas:
+        conversion = str2datetime(x)
+        meses = f"{conversion.month}-{conversion.year}"
+        listademeses.append(meses)
+    plt.bar(listademeses, promedios, 0.5)
+    plt.show()
+
+def plot_max_gains(diccionario,fecha_venta):
+    """
+    Esta función genera un gráfico de barras con las ganancias que se tienen por cada acción si se venden en un día determinado. 
+    ENTRADA: el diccionario obtenido a partir de la función read_file() y una fecha de venta.
+    SALIDA: un gráfico de barras con las ganancias que cada acción genera si se venden en ese día determinado.
+    """
+    max = {}
+    for clave in diccionario.keys():
+        if clave !='Date':
+            fecha_compra, ganancia = max_gain(clave, diccionario, fecha_venta)
+            max[clave] = ganancia
+    ypoints = max.values()
+    xpoints = max.keys()
+    plt.bar(xpoints, ypoints)
+    plt.show()
     
-
-
-
 """ >>>> ESCRIBAN SU CÓDIGO A PARTIR DE AQUÍ >>>> """
 
-diccionario = read_file("/Users/sofialopezmoreno/Library/Mobile Documents/com~apple~CloudDocs/ipc/TP-AnalisisBursatil/bolsa.csv")
+diccionario = read_file("/Users/chiarafacal/OneDrive/PENSAMIENTO COMPUTACIONAL/bolsa.csv")
 
 fechas, promedios_mes = monthly_average("SATL", diccionario)
 
@@ -190,6 +219,8 @@ fecha_compra, ganancia = max_gain("RTX", diccionario, fecha_venta)
 report_max_gains(diccionario,fecha_venta)
 
 plot_price("MELI", diccionario)
+
+monthly_average_bar_plot('SATL', diccionario)
 
 
 
